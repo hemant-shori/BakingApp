@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/iv_recipe_poster"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:background="@color/colorTransparentGrey"
+            android:scaleType="fitXY" />
+
+        <TextView
+            android:id="@+id/tv_servings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@color/colorTransparentGrey"
+            android:drawableLeft="@drawable/ic_fork_icon"
+            android:drawableStart="@drawable/ic_fork_icon"
+            android:gravity="center"
+            android:text="  4"
+            style="@style/Base.TextAppearance.AppCompat.Large"
+            android:padding="5dp"
+            android:textColor="@color/colorWhite" />
+
+
+        <TextView
+            android:id="@+id/tv_recipe_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="Cheese Cake"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:background="@color/colorTransparentGrey"
+            android:gravity="center"
+            android:padding="3dp"
+            android:textColor="@color/colorWhite" />
+
+    </FrameLayout>
+</android.support.v7.widget.CardView>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BakingApplication</string>
+    <string name="unable_to_connect_to_internet">Unable to Connect To Internet</string>
+    <string name="retry">Retry</string>
+    <string name="no_recipes_found">No Recipes Found. Please try after some time</string>
+    <string name="UnableToGetTheMovieData">Unable to Get the Movie Data</string>
+    <string name="AddToWidget">Add To Widget</string>
+</resources>
