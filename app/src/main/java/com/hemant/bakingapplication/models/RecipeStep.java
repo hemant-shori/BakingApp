@@ -5,6 +5,7 @@ public class RecipeStep {
     private String shortDescription;
     private String description;
     private String videoUrl;
+    private String thumbnailUrl;
 
     public String getShortDescription() {
         return shortDescription;
@@ -28,5 +29,13 @@ public class RecipeStep {
 
     public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

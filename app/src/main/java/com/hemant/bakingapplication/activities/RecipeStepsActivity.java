@@ -35,22 +35,14 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
             return;
         }
         Recipe recipe = getIntent().getParcelableExtra(SELECTED_RECIPE_DETAILS);
-        try {
-            if (findViewById(R.id.recipe_steps_master_list_container) != null) {
-                twoPaneLayout = true;
-            }
-            if (savedInstanceState != null && savedInstanceState.containsKey(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY)) {
-                currentStepCount = savedInstanceState.getInt(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY);
-            }
-            assert getSupportActionBar() != null;
-            getSupportActionBar().setTitle(recipe.getName());
-            RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+        if (findViewById(R.id.recipe_steps_master_list_container) != null) {
+            twoPaneLayout = true;
         }
+        if (savedInstanceState != null && savedInstanceState.containsKey(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY)) {
+            currentStepCount = savedInstanceState.getInt(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY);
+        }
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle(recipe.getName());
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(IngredientsDetailsActivity.SELECTED_RECIPE_DETAILS, recipe);

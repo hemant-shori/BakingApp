@@ -76,11 +76,8 @@ public final class RecipesJsonUtils {
             RecipeStep recipeStep = new RecipeStep();
             recipeStep.setShortDescription(recipeStepsJsonObject.getString(SHORT_DESCRIPTION));
             recipeStep.setDescription(recipeStepsJsonObject.getString(DESCRIPTION));
-            String videoUrl = recipeStepsJsonObject.getString(VIDEO_URL);
-            if (videoUrl.equals("")) {
-                videoUrl = recipeStepsJsonObject.getString(THUMBNAIL_URL);
-            }
-            recipeStep.setVideoUrl(videoUrl);
+            recipeStep.setVideoUrl(recipeStepsJsonObject.getString(VIDEO_URL));
+            recipeStep.setThumbnailUrl(recipeStepsJsonObject.getString(THUMBNAIL_URL));
             recipeStepArrayList.add(recipeStep);
         }
         return recipeStepArrayList;

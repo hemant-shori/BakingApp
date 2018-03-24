@@ -9,11 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -215,7 +217,27 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
         RecipeStep recipeStep = recipeStepArrayList.get(currentStepCount - 1);
         recipeStepsFragmentBinding.tvRecipeStepsShortDescription.setText(recipeStep.getShortDescription());
         recipeStepsFragmentBinding.tvRecipeStepsDescription.setText(recipeStep.getDescription());
-        changeRecipeStepMedia(Uri.parse(recipeStep.getVideoUrl()));
+        if (TextUtils.isEmpty(recipeStep.getVideoUrl())) {
+            recipeStepsFragmentBinding.recipeStepsExoPlayerView.setVisibility(View.GONE);
+            recipeStepsFragmentBinding.recipeStepsThumbnailImageView.setVisibility(View.VISIBLE);
+            setUpThumbnailImageView(recipeStep.getThumbnailUrl());
+        } else {
+            recipeStepsFragmentBinding.recipeStepsExoPlayerView.setVisibility(View.VISIBLE);
+            recipeStepsFragmentBinding.recipeStepsThumbnailImageView.setVisibility(View.GONE);
+            changeRecipeStepMedia(Uri.parse(recipeStep.getVideoUrl()));
+        }
+    }
+
+    private void setUpThumbnailImageView(String thumbnailUrl) {
+        if (simpleExoPlayer != null) {
+            simpleExoPlayer.stop();
+        }
+        if (TextUtils.isEmpty(thumbnailUrl)) {
+            recipeStepsFragmentBinding.recipeStepsThumbnailImageView.setImageResource(R.drawable.ic_place_holder);
+        } else {
+            if (getContext() != null)
+                Glide.with(getContext()).load(thumbnailUrl).into(recipeStepsFragmentBinding.recipeStepsThumbnailImageView);
+        }
     }
 
     private void goToPreviewStep() {

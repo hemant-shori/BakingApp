@@ -12,4 +12,5 @@
     <string name="UnableToConnect">Unable to Connect</string>
     <string name="UnableToFetchIngredients">Unable to Fetch Ingredients List from Recipe. /nPlease Try after some time</string>
     <string name="UnableToFetchRecipeSteps">Unable to Fetch Recipe Steps List from Recipe. /nPlease Try after some time</string>
+    <string name="recipe_step_thumbnail">Recipe\'s Step Thumbnail</string>
 </resources>
