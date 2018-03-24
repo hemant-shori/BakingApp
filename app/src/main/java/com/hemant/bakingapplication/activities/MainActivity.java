@@ -2,20 +2,20 @@ package com.hemant.bakingapplication.activities;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hemant.bakingapplication.R;
 import com.hemant.bakingapplication.adapters.BakingRecipesAdapter;
+import com.hemant.bakingapplication.databinding.ActivityMainBinding;
 import com.hemant.bakingapplication.interfaces.AsyncTaskLoaderInterface;
 import com.hemant.bakingapplication.models.Recipe;
 import com.hemant.bakingapplication.network.FetchRecipesAsyncTaskLoader;
@@ -23,28 +23,26 @@ import com.hemant.bakingapplication.network.FetchRecipesAsyncTaskLoader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AsyncTaskLoaderInterface, BakingRecipesAdapter.OnRecipesClickListener, LoaderManager.LoaderCallbacks<ArrayList<Recipe>> {
-    private RecyclerView recipesRecyclerView;
-    private ProgressBar loadRecipesProgressBar;
     private BakingRecipesAdapter bakingRecipesAdapter;
     private static final int RECIPES_LIST_LOADER = 100;
+    private ActivityMainBinding activityMainBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        recipesRecyclerView = findViewById(R.id.recipes_recycler_view);
-        loadRecipesProgressBar = findViewById(R.id.load_recipes_progress_bar);
+//        setContentView(R.layout.activity_main);
+        activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main);
         int columnCount = getColumnAccordingToScreenSize();
         if (columnCount == 1) {
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-            recipesRecyclerView.setLayoutManager(linearLayoutManager);
+            activityMainBinding.recipesRecyclerView.setLayoutManager(linearLayoutManager);
         } else {
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columnCount);
-            recipesRecyclerView.setLayoutManager(gridLayoutManager);
+            activityMainBinding.recipesRecyclerView.setLayoutManager(gridLayoutManager);
         }
-        recipesRecyclerView.setHasFixedSize(true);
+        activityMainBinding.recipesRecyclerView.setHasFixedSize(true);
         bakingRecipesAdapter = new BakingRecipesAdapter(this);
-        recipesRecyclerView.setAdapter(bakingRecipesAdapter);
+        activityMainBinding.recipesRecyclerView.setAdapter(bakingRecipesAdapter);
     }
 
     private int getColumnAccordingToScreenSize() {
@@ -89,15 +87,15 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskLoaderIn
     }
 
     private void showNoRecipesFoundUI() {
-        loadRecipesProgressBar.setVisibility(View.GONE);
-        recipesRecyclerView.setVisibility(View.GONE);
+        activityMainBinding.loadRecipesProgressBar.setVisibility(View.GONE);
+        activityMainBinding.recipesRecyclerView.setVisibility(View.GONE);
         findViewById(R.id.error_loading_recipes_layout).setVisibility(View.VISIBLE);
         ((TextView) findViewById(R.id.tv_recipes_network_response)).setText(R.string.no_recipes_found);
     }
 
     private void showRecipeUI() {
-        loadRecipesProgressBar.setVisibility(View.GONE);
-        recipesRecyclerView.setVisibility(View.VISIBLE);
+        activityMainBinding.loadRecipesProgressBar.setVisibility(View.GONE);
+        activityMainBinding.recipesRecyclerView.setVisibility(View.VISIBLE);
         findViewById(R.id.error_loading_recipes_layout).setVisibility(View.GONE);
     }
 
@@ -116,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskLoaderIn
 
     @Override
     public void onStartLoading() {
-        loadRecipesProgressBar.setVisibility(View.VISIBLE);
-        recipesRecyclerView.setVisibility(View.GONE);
+        activityMainBinding.loadRecipesProgressBar.setVisibility(View.VISIBLE);
+        activityMainBinding.recipesRecyclerView.setVisibility(View.GONE);
         findViewById(R.id.error_loading_recipes_layout).setVisibility(View.GONE);
         bakingRecipesAdapter.swapRecipes(null);
     }

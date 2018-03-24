@@ -13,28 +13,36 @@ import com.hemant.bakingapplication.models.RecipeStep;
 import java.util.ArrayList;
 
 public class RecipeMasterListAdapter extends RecyclerView.Adapter<RecipeMasterListAdapter.MasterListViewHolder> {
+    private int mSelectedItem = 0;
+
     public interface OnRecyclerViewItemClickListener {
         void onItemClicked(int position);
     }
 
-    private OnRecyclerViewItemClickListener onRecyclerViewItemClickListener;
-    private ArrayList<RecipeStep> recipeStepArrayList;
+    private final OnRecyclerViewItemClickListener onRecyclerViewItemClickListener;
+    private final ArrayList<RecipeStep> recipeStepArrayList;
 
-    public RecipeMasterListAdapter(ArrayList<RecipeStep> recipeStepArrayList, OnRecyclerViewItemClickListener onRecyclerViewItemClickListener) {
+    public RecipeMasterListAdapter(ArrayList<RecipeStep> recipeStepArrayList, OnRecyclerViewItemClickListener onRecyclerViewItemClickListener, int selectedItemPosition) {
         this.recipeStepArrayList = recipeStepArrayList;
         this.onRecyclerViewItemClickListener = onRecyclerViewItemClickListener;
+        this.mSelectedItem = selectedItemPosition;
     }
 
     @NonNull
     @Override
     public MasterListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_steps_master_list_text_view, parent, false);
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_steps_master_list_item_text_view, parent, false);
         return new MasterListViewHolder(rootView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MasterListViewHolder holder, int position) {
         RecipeStep recipeStep = recipeStepArrayList.get(position);
+        if (mSelectedItem == position) {
+            holder.itemView.setSelected(true);
+        } else {
+            holder.itemView.setSelected(false);
+        }
         holder.bind(recipeStep.getShortDescription());
     }
 
@@ -48,7 +56,7 @@ public class RecipeMasterListAdapter extends RecyclerView.Adapter<RecipeMasterLi
     }
 
     public class MasterListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        View itemView;
+        final View itemView;
 
         MasterListViewHolder(View itemView) {
             super(itemView);
@@ -63,7 +71,9 @@ public class RecipeMasterListAdapter extends RecyclerView.Adapter<RecipeMasterLi
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.tv_recipe_step_master) {
+                mSelectedItem = getAdapterPosition();
                 onRecyclerViewItemClickListener.onItemClicked(getAdapterPosition());
+                notifyDataSetChanged();
             }
         }
     }

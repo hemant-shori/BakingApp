@@ -1,9 +1,5 @@
 package com.hemant.bakingapplication.models;
 
-/**
- * Created by ShadowRunner on 3/20/2018.
- */
-
 public class Ingredient {
     private String ingredientName;
     private String quantity;

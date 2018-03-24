@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_launch_steps"
+        android:id="@+id/action_add_to_widget"
         android:orderInCategory="1"
         android:title="@string/AddToWidget"
         app:showAsAction="always" />

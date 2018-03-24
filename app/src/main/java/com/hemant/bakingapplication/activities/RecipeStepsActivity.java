@@ -9,12 +9,9 @@ import com.hemant.bakingapplication.R;
 import com.hemant.bakingapplication.fragments.RecipeStepsFragment;
 import com.hemant.bakingapplication.fragments.RecipeStepsMasterListFragment;
 import com.hemant.bakingapplication.models.Recipe;
-import com.hemant.bakingapplication.models.RecipeStep;
 import com.hemant.bakingapplication.utils.RecipesJsonUtils;
 
 import org.json.JSONException;
-
-import java.util.ArrayList;
 
 import static com.hemant.bakingapplication.activities.IngredientsDetailsActivity.SELECTED_RECIPE_DETAILS;
 import static com.hemant.bakingapplication.fragments.RecipeStepsFragment.IS_TWO_PANE_LAYOUT_ENABLED_KEY;
@@ -23,9 +20,7 @@ import static com.hemant.bakingapplication.fragments.RecipeStepsFragment.RECIPE_
 
 public class RecipeStepsActivity extends AppCompatActivity implements RecipeStepsMasterListFragment.OnMasterListItemClickListener {
     private final String SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY = "SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY";
-    private Recipe recipe;
     private RecipeStepsFragment recipeStepsFragment;
-    private ArrayList<RecipeStep> recipeStepArrayList;
     private boolean twoPaneLayout;
     private int currentStepCount = 1;
 
@@ -33,22 +28,23 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.recipe_steps_activity);
         if (!getIntent().hasExtra(SELECTED_RECIPE_DETAILS)) {
             Toast.makeText(getApplicationContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        recipe = getIntent().getParcelableExtra(SELECTED_RECIPE_DETAILS);
+        Recipe recipe = getIntent().getParcelableExtra(SELECTED_RECIPE_DETAILS);
         try {
-            setContentView(R.layout.recipe_steps_activity);
             if (findViewById(R.id.recipe_steps_master_list_container) != null) {
                 twoPaneLayout = true;
             }
             if (savedInstanceState != null && savedInstanceState.containsKey(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY)) {
                 currentStepCount = savedInstanceState.getInt(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY);
             }
-
-            recipeStepArrayList = RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
+            assert getSupportActionBar() != null;
+            getSupportActionBar().setTitle(recipe.getName());
+            RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
         } catch (JSONException e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
@@ -84,4 +80,7 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
         outState.putInt(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY, recipeStepsFragment.getCurrentStepCount());
     }
 
+    public boolean twoPaneLayoutEnabled() {
+        return twoPaneLayout;
+    }
 }

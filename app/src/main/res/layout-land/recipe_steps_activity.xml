@@ -20,7 +20,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="InconsistentLayout">
 
     </FrameLayout>
 
@@ -36,7 +37,7 @@
     </FrameLayout>
 
     <View
-        android:layout_width="1dp"
+        android:layout_width="@dimen/divider_size_1dp"
         android:layout_height="match_parent"
         android:background="@color/colorDividerGrey"
         app:layout_constraintBottom_toBottomOf="parent"

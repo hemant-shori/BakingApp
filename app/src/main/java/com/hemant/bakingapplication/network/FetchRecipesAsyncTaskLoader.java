@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class FetchRecipesAsyncTaskLoader extends AsyncTaskLoader<ArrayList<Recipe>> {
-    private AsyncTaskLoaderInterface asyncTaskLoaderInterface;
+    private final AsyncTaskLoaderInterface asyncTaskLoaderInterface;
     private ArrayList<Recipe> recipeArrayList;
 
     public FetchRecipesAsyncTaskLoader(@NonNull Context context, AsyncTaskLoaderInterface asyncTaskLoaderInterface) {

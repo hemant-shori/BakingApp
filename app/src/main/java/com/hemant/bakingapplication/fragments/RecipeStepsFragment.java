@@ -1,16 +1,17 @@
 package com.hemant.bakingapplication.fragments;
 
+import android.content.DialogInterface;
+import android.databinding.DataBindingUtil;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -22,10 +23,10 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.hemant.bakingapplication.R;
+import com.hemant.bakingapplication.databinding.RecipeStepsFragmentBinding;
 import com.hemant.bakingapplication.models.Recipe;
 import com.hemant.bakingapplication.models.RecipeStep;
 import com.hemant.bakingapplication.utils.RecipesJsonUtils;
@@ -39,51 +40,43 @@ import static com.hemant.bakingapplication.activities.IngredientsDetailsActivity
 
 public class RecipeStepsFragment extends Fragment implements View.OnClickListener {
     public static final String RECIPE_STEP_CURRENT_COUNT_KEY = "RECIPE_STEP_CURRENT_COUNT_KEY";
-    public static String IS_TWO_PANE_LAYOUT_ENABLED_KEY = "IS_TWO_PANE_LAYOUT_ENABLED_KEY";
+    public static final String IS_TWO_PANE_LAYOUT_ENABLED_KEY = "IS_TWO_PANE_LAYOUT_ENABLED_KEY";
     private boolean twoPaneLayout = false;
-    SimpleExoPlayerView simpleExoPlayerView;
-    SimpleExoPlayer simpleExoPlayer;
-    Recipe recipe;
     private ArrayList<RecipeStep> recipeStepArrayList;
     private int currentStepCount = 1;
-    private FloatingActionButton nextStepFAB, previousStepFAB;
-    private TextView shortDescriptionTextView, descriptionTextView;
+    private RecipeStepsFragmentBinding recipeStepsFragmentBinding;
+    private SimpleExoPlayer simpleExoPlayer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.recepe_steps_fragment, container, false);
-        simpleExoPlayerView = rootView.findViewById(R.id.recipe_steps_exo_player_view);
-        simpleExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.ic_place_holder));
+        recipeStepsFragmentBinding = DataBindingUtil.inflate(inflater, R.layout.recipe_steps_fragment, container, false);
+        recipeStepsFragmentBinding.recipeStepsExoPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.ic_place_holder));
         if (getArguments() == null || !getArguments().containsKey(SELECTED_RECIPE_DETAILS)) {
             Toast.makeText(getContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
             showErrorUI();
         } else {
             try {
                 initializePlayer();
-                recipe = getArguments().getParcelable(SELECTED_RECIPE_DETAILS);
+                Recipe recipe = getArguments().getParcelable(SELECTED_RECIPE_DETAILS);
                 if (getArguments().containsKey(IS_TWO_PANE_LAYOUT_ENABLED_KEY))
                     twoPaneLayout = getArguments().getBoolean(IS_TWO_PANE_LAYOUT_ENABLED_KEY);
                 if (getArguments().containsKey(RECIPE_STEP_CURRENT_COUNT_KEY))
                     currentStepCount = getArguments().getInt(RECIPE_STEP_CURRENT_COUNT_KEY);
                 assert recipe != null;
                 recipeStepArrayList = RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
-                nextStepFAB = rootView.findViewById(R.id.fab_steps_next);
-                nextStepFAB.setOnClickListener(this);
-                previousStepFAB = rootView.findViewById(R.id.fab_steps_previous);
-                previousStepFAB.setOnClickListener(this);
-                shortDescriptionTextView = rootView.findViewById(R.id.tv_recipe_steps_short_description);
-                descriptionTextView = rootView.findViewById(R.id.tv_recipe_steps_description);
+                recipeStepsFragmentBinding.fabStepsNext.setOnClickListener(this);
+                recipeStepsFragmentBinding.fabStepsPrevious.setOnClickListener(this);
                 if (twoPaneLayout) {
-                    nextStepFAB.setVisibility(View.GONE);
-                    previousStepFAB.setVisibility(View.GONE);
+                    recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
+                    recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
                 } else {
                     if (currentStepCount == 1) {
-                        previousStepFAB.setVisibility(View.GONE);
-                        nextStepFAB.setVisibility(View.VISIBLE);
+                        recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
+                        recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.VISIBLE);
                     } else if (currentStepCount == recipeStepArrayList.size()) {
-                        nextStepFAB.setVisibility(View.GONE);
-                        previousStepFAB.setVisibility(View.VISIBLE);
+                        recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
+                        recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.VISIBLE);
                     }
                 }
                 updateCurrentStepUI();
@@ -93,11 +86,11 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
                 showErrorUI();
             }
         }
-        return rootView;
+        return recipeStepsFragmentBinding.getRoot();
     }
 
     private void changeRecipeStepMedia(Uri mediaUri) {
-        if (simpleExoPlayerView != null && simpleExoPlayer != null) {
+        if (recipeStepsFragmentBinding.recipeStepsExoPlayerView != null && simpleExoPlayer != null) {
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             assert getContext() != null;
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(),
@@ -108,7 +101,18 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
     }
 
     private void showErrorUI() {
-        //TODO: show error UI
+        assert getContext() != null;
+        new AlertDialog.Builder(getContext(), R.style.MyAlertDialog)
+                .setTitle(R.string.UnableToConnect)
+                .setMessage(R.string.UnableToFetchRecipeSteps)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (getActivity() != null)
+                            getActivity().finish();
+                    }
+                }).setCancelable(false)
+                .create().show();
     }
 
     private void initializePlayer() {
@@ -117,7 +121,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             LoadControl loadControl = new DefaultLoadControl();
             simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector,
                     loadControl);
-            simpleExoPlayerView.setPlayer(simpleExoPlayer);
+            recipeStepsFragmentBinding.recipeStepsExoPlayerView.setPlayer(simpleExoPlayer);
         }
     }
 
@@ -158,27 +162,27 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
 
     private void gotoNextStep() {
         if (currentStepCount + 1 == recipeStepArrayList.size()) {
-            nextStepFAB.setVisibility(View.GONE);
+            recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
         }
         currentStepCount++;
         updateCurrentStepUI();
-        previousStepFAB.setVisibility(View.VISIBLE);
+        recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.VISIBLE);
     }
 
     private void updateCurrentStepUI() {
         RecipeStep recipeStep = recipeStepArrayList.get(currentStepCount - 1);
-        shortDescriptionTextView.setText(recipeStep.getShortDescription());
-        descriptionTextView.setText(recipeStep.getDescription());
+        recipeStepsFragmentBinding.tvRecipeStepsShortDescription.setText(recipeStep.getShortDescription());
+        recipeStepsFragmentBinding.tvRecipeStepsDescription.setText(recipeStep.getDescription());
         changeRecipeStepMedia(Uri.parse(recipeStep.getVideoUrl()));
     }
 
     private void goToPreviewStep() {
         if (currentStepCount - 1 == 1) {
-            previousStepFAB.setVisibility(View.GONE);
+            recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
         }
         currentStepCount--;
         updateCurrentStepUI();
-        nextStepFAB.setVisibility(View.VISIBLE);
+        recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.VISIBLE);
     }
 
     public void updateRecipeStep(int position) {

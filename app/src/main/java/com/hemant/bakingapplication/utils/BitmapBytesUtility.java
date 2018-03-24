@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 
 public class BitmapBytesUtility {
     // convert from bitmap to byte array
+    @SuppressWarnings("unused")
     public static byte[] getBytes(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);

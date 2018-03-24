@@ -1,21 +1,23 @@
 package com.hemant.bakingapplication.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.hemant.bakingapplication.R;
-import com.hemant.bakingapplication.activities.RecipeStepsActivity;
 import com.hemant.bakingapplication.adapters.RecipeMasterListAdapter;
+import com.hemant.bakingapplication.databinding.RecipeStepsMasterListBinding;
 import com.hemant.bakingapplication.models.Recipe;
 import com.hemant.bakingapplication.models.RecipeStep;
 import com.hemant.bakingapplication.utils.RecipesJsonUtils;
@@ -33,8 +35,6 @@ public class RecipeStepsMasterListFragment extends Fragment implements RecipeMas
     }
 
     private OnMasterListItemClickListener onMasterListItemClickListener;
-    private Recipe recipe;
-    private ArrayList<RecipeStep> recipeStepArrayList;
     private int currentStepCount = 1;
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -55,28 +55,29 @@ public class RecipeStepsMasterListFragment extends Fragment implements RecipeMas
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.recipe_steps_mater_list, container, false);
+        RecipeStepsMasterListBinding recipeStepsMasterListBinding = DataBindingUtil.inflate(inflater,
+                R.layout.recipe_steps_master_list, container, false);
         if (getArguments() == null || !getArguments().containsKey(SELECTED_RECIPE_DETAILS)) {
             Toast.makeText(getContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
             showErrorUI();
         } else {
             try {
-                recipe = getArguments().getParcelable(SELECTED_RECIPE_DETAILS);
+                Recipe recipe = getArguments().getParcelable(SELECTED_RECIPE_DETAILS);
 
                 if (getArguments().containsKey(RECIPE_STEP_CURRENT_COUNT_KEY))
                     currentStepCount = getArguments().getInt(RECIPE_STEP_CURRENT_COUNT_KEY);
                 assert recipe != null;
-                recipeStepArrayList = RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
+                ArrayList<RecipeStep> recipeStepArrayList = RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
 
-                RecyclerView masterListRecyclerView = rootView.findViewById(R.id.rv_recipe_steps_master_list);
-                masterListRecyclerView.setLayoutManager(new
+                recipeStepsMasterListBinding.rvRecipeStepsMasterList.setLayoutManager(new
 
                         LinearLayoutManager(getContext()));
-                masterListRecyclerView.setHasFixedSize(true);
-                DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(masterListRecyclerView.getContext(),
+                recipeStepsMasterListBinding.rvRecipeStepsMasterList.setHasFixedSize(true);
+                DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recipeStepsMasterListBinding.rvRecipeStepsMasterList.getContext(),
                         LinearLayoutManager.VERTICAL);
-                masterListRecyclerView.addItemDecoration(mDividerItemDecoration);
-                masterListRecyclerView.setAdapter(new RecipeMasterListAdapter(recipeStepArrayList, this));
+                recipeStepsMasterListBinding.rvRecipeStepsMasterList.addItemDecoration(mDividerItemDecoration);
+                recipeStepsMasterListBinding.rvRecipeStepsMasterList.setAdapter(new RecipeMasterListAdapter(recipeStepArrayList, this, currentStepCount - 1));
+
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(getContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
@@ -84,15 +85,27 @@ public class RecipeStepsMasterListFragment extends Fragment implements RecipeMas
             }
         }
 
-        return rootView;
+        return recipeStepsMasterListBinding.getRoot();
     }
 
     private void showErrorUI() {
-
+        assert getContext() != null;
+        new AlertDialog.Builder(getContext(), R.style.MyAlertDialog)
+                .setTitle(R.string.UnableToConnect)
+                .setMessage(R.string.UnableToFetchRecipeSteps)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (getActivity() != null)
+                            getActivity().finish();
+                    }
+                }).setCancelable(false)
+                .create().show();
     }
 
     @Override
     public void onItemClicked(int position) {
         onMasterListItemClickListener.onItemClicked(position);
     }
+
 }

@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    android:layout_margin="@dimen/card_view_padding_10dp">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -11,36 +11,34 @@
         <ImageView
             android:id="@+id/iv_recipe_poster"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="@dimen/recipe_poster_image_view_250dp"
             android:layout_gravity="center"
             android:background="@color/colorTransparentGrey"
+            android:contentDescription="@string/RecipePosterImage"
             android:scaleType="fitXY" />
 
         <TextView
             android:id="@+id/tv_servings"
+            style="@style/Base.TextAppearance.AppCompat.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:background="@color/colorTransparentGrey"
-            android:drawableLeft="@drawable/ic_fork_icon"
             android:drawableStart="@drawable/ic_fork_icon"
             android:gravity="center"
-            android:text="  4"
-            style="@style/Base.TextAppearance.AppCompat.Large"
-            android:padding="5dp"
+            android:padding="@dimen/padding_5dp"
             android:textColor="@color/colorWhite" />
 
 
         <TextView
             android:id="@+id/tv_recipe_name"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="Cheese Cake"
-            style="@style/Base.TextAppearance.AppCompat.Medium"
             android:background="@color/colorTransparentGrey"
             android:gravity="center"
-            android:padding="3dp"
+            android:padding="@dimen/padding_3dp"
             android:textColor="@color/colorWhite" />
 
     </FrameLayout>

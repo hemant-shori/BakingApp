@@ -15,7 +15,7 @@ public class Recipe implements Parcelable {
 
     }
 
-    protected Recipe(Parcel in) {
+    private Recipe(Parcel in) {
         name = in.readString();
         serving = in.readString();
         ingredients = in.readString();
@@ -29,6 +29,7 @@ public class Recipe implements Parcelable {
         //recipePoster = in.createByteArray();
     }
 
+    @SuppressWarnings("unused")
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
         @Override
         public Recipe createFromParcel(Parcel in) {
@@ -53,7 +54,7 @@ public class Recipe implements Parcelable {
         return recipePoster;
     }
 
-    public void setRecipePoster(byte[] recipePoster) {
+    private void setRecipePoster(byte[] recipePoster) {
         this.recipePoster = recipePoster;
     }
 

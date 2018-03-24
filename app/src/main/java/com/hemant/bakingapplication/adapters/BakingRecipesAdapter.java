@@ -21,7 +21,7 @@ public class BakingRecipesAdapter extends RecyclerView.Adapter<BakingRecipesAdap
     }
 
     private ArrayList<Recipe> recipes;
-    private OnRecipesClickListener onRecipesClickListener;
+    private final OnRecipesClickListener onRecipesClickListener;
 
     public BakingRecipesAdapter(OnRecipesClickListener onRecipesClickListener) {
         this.recipes = null;
@@ -61,7 +61,7 @@ public class BakingRecipesAdapter extends RecyclerView.Adapter<BakingRecipesAdap
         final ImageView recipePosterImageView;
         final TextView servingTextView, recipeNameTextView;
 
-        public GridRecipesViewHolder(View itemView) {
+        GridRecipesViewHolder(View itemView) {
             super(itemView);
             servingTextView = itemView.findViewById(R.id.tv_servings);
             recipeNameTextView = itemView.findViewById(R.id.tv_recipe_name);

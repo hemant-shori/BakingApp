@@ -22,10 +22,7 @@ public final class RecipesJsonUtils {
         final String SERVINGS = "servings";
 
 
-        final String SHORT_DESCRIPTION = "shortDescription";
-        final String DESCRIPTION = "description";
         final String VIDEO_URL = "videoURL";
-        final String THUMBNAIL_URL = "thumbnailURL";
 
         JSONArray outerJsonArray = new JSONArray(movieDetailsString);
         ArrayList<Recipe> recipeArrayList = new ArrayList<>(outerJsonArray.length());
