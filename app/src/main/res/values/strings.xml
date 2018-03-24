@@ -4,8 +4,8 @@
     <string name="retry">Retry</string>
     <string name="no_recipes_found">No Recipes Found. Please try after some time</string>
     <string name="UnableToGetTheMovieData">Unable to Get the Movie Data</string>
-    <string name="AddToWidget">Add To Widget</string>
-    <string name="appwidget_text">Please Select a Favorite Recipe from the Recipe Application by clicking in Add to Widget Button.\n\nClick here to Open Application!</string>
+    <string name="AddToFavorite">Add To Favorite</string>
+    <string name="appwidget_text">Please Select a Favorite Recipe from the Recipe Application by clicking in Add to Favorite Button.\n\nClick here to Open Application!</string>
     <string name="SelectFavoriteRecipeHere">Select Favorite Recipe Here</string>
     <string name="Ingredients"> Ingredients</string>
     <string name="RecipePosterImage">Recipe Poster Image</string>
