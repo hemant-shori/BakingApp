@@ -49,6 +49,7 @@
                     android:layout_height="@dimen/exo_player_height"
                     android:layout_marginTop="@dimen/margin_8dp"
                     android:background="@color/colorTransparentGrey"
+                    app:srcCompat="@drawable/ic_place_holder"
                     android:scaleType="fitXY"
                     android:visibility="gone"
                     android:contentDescription="@string/recipe_step_thumbnail">

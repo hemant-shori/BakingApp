@@ -1,5 +1,7 @@
 package com.hemant.bakingapplication.utils;
 
+import android.text.TextUtils;
+
 import com.hemant.bakingapplication.models.Ingredient;
 import com.hemant.bakingapplication.models.Recipe;
 import com.hemant.bakingapplication.models.RecipeStep;
@@ -20,6 +22,7 @@ public final class RecipesJsonUtils {
         final String INGREDIENTS = "ingredients";
         final String STEPS = "steps";
         final String SERVINGS = "servings";
+        final String IMAGE = "image";
 
 
         final String VIDEO_URL = "videoURL";
@@ -34,7 +37,10 @@ public final class RecipesJsonUtils {
             recipe.setIngredients(recipesDetailsJsonObject.getJSONArray(INGREDIENTS).toString());
 
             JSONArray recipeSteps = recipesDetailsJsonObject.getJSONArray(STEPS);
-            String posterUrl = recipeSteps.getJSONObject(recipeSteps.length() - 1).getString(VIDEO_URL);
+            String posterUrl = recipesDetailsJsonObject.getString(IMAGE);
+            if (TextUtils.isEmpty(posterUrl)) {
+                posterUrl = recipeSteps.getJSONObject(recipeSteps.length() - 1).getString(VIDEO_URL);
+            }
             recipe.setRecipePosterURL(posterUrl);
             recipe.setSteps(recipeSteps.toString());
             recipe.setServing(String.valueOf(recipesDetailsJsonObject.getInt(SERVINGS)));
