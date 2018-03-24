@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -41,11 +42,15 @@ import static com.hemant.bakingapplication.activities.IngredientsDetailsActivity
 public class RecipeStepsFragment extends Fragment implements View.OnClickListener {
     public static final String RECIPE_STEP_CURRENT_COUNT_KEY = "RECIPE_STEP_CURRENT_COUNT_KEY";
     public static final String IS_TWO_PANE_LAYOUT_ENABLED_KEY = "IS_TWO_PANE_LAYOUT_ENABLED_KEY";
+    private static final String SELECTED_PLAYER_POSITION_KEY = "SELECTED_PLAYER_POSITION_KEY";
+    private static final String SELECTED_PLAYER_RESUME_WINDOW_KEY = "SELECTED_PLAYER_RESUME_WINDOW_KEY";
     private boolean twoPaneLayout = false;
     private ArrayList<RecipeStep> recipeStepArrayList;
     private int currentStepCount = 1;
     private RecipeStepsFragmentBinding recipeStepsFragmentBinding;
     private SimpleExoPlayer simpleExoPlayer;
+    private long playerPosition = C.TIME_UNSET;
+    private int resumeWindow = C.INDEX_UNSET;
 
     @Nullable
     @Override
@@ -59,27 +64,10 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             try {
                 initializePlayer();
                 Recipe recipe = getArguments().getParcelable(SELECTED_RECIPE_DETAILS);
-                if (getArguments().containsKey(IS_TWO_PANE_LAYOUT_ENABLED_KEY))
-                    twoPaneLayout = getArguments().getBoolean(IS_TWO_PANE_LAYOUT_ENABLED_KEY);
-                if (getArguments().containsKey(RECIPE_STEP_CURRENT_COUNT_KEY))
-                    currentStepCount = getArguments().getInt(RECIPE_STEP_CURRENT_COUNT_KEY);
                 assert recipe != null;
                 recipeStepArrayList = RecipesJsonUtils.getRecipeStepsDetails(recipe.getSteps());
                 recipeStepsFragmentBinding.fabStepsNext.setOnClickListener(this);
                 recipeStepsFragmentBinding.fabStepsPrevious.setOnClickListener(this);
-                if (twoPaneLayout) {
-                    recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
-                    recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
-                } else {
-                    if (currentStepCount == 1) {
-                        recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
-                        recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.VISIBLE);
-                    } else if (currentStepCount == recipeStepArrayList.size()) {
-                        recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
-                        recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.VISIBLE);
-                    }
-                }
-                updateCurrentStepUI();
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(getContext(), getString(R.string.UnableToGetTheMovieData), Toast.LENGTH_SHORT).show();
@@ -89,13 +77,30 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
         return recipeStepsFragmentBinding.getRoot();
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SELECTED_PLAYER_POSITION_KEY)) {
+                playerPosition = savedInstanceState.getLong(SELECTED_PLAYER_POSITION_KEY);
+            }
+            if (savedInstanceState.containsKey(SELECTED_PLAYER_RESUME_WINDOW_KEY)) {
+                resumeWindow = savedInstanceState.getInt(SELECTED_PLAYER_RESUME_WINDOW_KEY);
+            }
+        }
+    }
+
     private void changeRecipeStepMedia(Uri mediaUri) {
         if (recipeStepsFragmentBinding.recipeStepsExoPlayerView != null && simpleExoPlayer != null) {
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             assert getContext() != null;
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(),
                     userAgent), new DefaultExtractorsFactory(), null, null);
-            simpleExoPlayer.prepare(mediaSource);
+            boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
+            if (haveResumePosition) {
+                simpleExoPlayer.seekTo(resumeWindow, playerPosition);
+            }
+            simpleExoPlayer.prepare(mediaSource, !haveResumePosition, false);
             simpleExoPlayer.setPlayWhenReady(true);
         }
     }
@@ -122,6 +127,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector,
                     loadControl);
             recipeStepsFragmentBinding.recipeStepsExoPlayerView.setPlayer(simpleExoPlayer);
+
         }
     }
 
@@ -138,14 +144,49 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
         super.onPause();
         if (simpleExoPlayer != null) {
             simpleExoPlayer.stop();
+            playerPosition = simpleExoPlayer.getCurrentPosition();
+            resumeWindow = simpleExoPlayer.getCurrentWindowIndex();
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        assert getArguments() != null;
+        if (getArguments().containsKey(IS_TWO_PANE_LAYOUT_ENABLED_KEY))
+            twoPaneLayout = getArguments().getBoolean(IS_TWO_PANE_LAYOUT_ENABLED_KEY);
+        if (getArguments().containsKey(RECIPE_STEP_CURRENT_COUNT_KEY))
+            currentStepCount = getArguments().getInt(RECIPE_STEP_CURRENT_COUNT_KEY);
+        if (twoPaneLayout) {
+            recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
+            recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
+        } else {
+            if (currentStepCount == 1) {
+                recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
+                recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.VISIBLE);
+            } else if (currentStepCount == recipeStepArrayList.size()) {
+                recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
+                recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.VISIBLE);
+            }
+        }
+        updateCurrentStepUI();
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         releasePlayer();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (playerPosition != C.TIME_UNSET) {
+            outState.putLong(SELECTED_PLAYER_POSITION_KEY, playerPosition);
+        }
+        if (resumeWindow != C.INDEX_UNSET) {
+            outState.putInt(SELECTED_PLAYER_RESUME_WINDOW_KEY, resumeWindow);
+        }
     }
 
     @Override
@@ -165,6 +206,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.GONE);
         }
         currentStepCount++;
+        clearResumePosition();
         updateCurrentStepUI();
         recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.VISIBLE);
     }
@@ -181,13 +223,20 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             recipeStepsFragmentBinding.fabStepsPrevious.setVisibility(View.GONE);
         }
         currentStepCount--;
+        clearResumePosition();
         updateCurrentStepUI();
         recipeStepsFragmentBinding.fabStepsNext.setVisibility(View.VISIBLE);
     }
 
     public void updateRecipeStep(int position) {
         currentStepCount = position + 1;
+        clearResumePosition();
         updateCurrentStepUI();
+    }
+
+    private void clearResumePosition() {
+        resumeWindow = C.INDEX_UNSET;
+        playerPosition = C.TIME_UNSET;
     }
 
     public int getCurrentStepCount() {

@@ -51,15 +51,22 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
             finish();
             return;
         }
-        recipeStepsFragment = new RecipeStepsFragment();
+
         Bundle bundle = new Bundle();
         bundle.putParcelable(IngredientsDetailsActivity.SELECTED_RECIPE_DETAILS, recipe);
         bundle.putBoolean(IS_TWO_PANE_LAYOUT_ENABLED_KEY, twoPaneLayout);
         bundle.putInt(RECIPE_STEP_CURRENT_COUNT_KEY, currentStepCount);
-        recipeStepsFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.recipe_steps_container, recipeStepsFragment)
-                .commit();
+
+        if (savedInstanceState != null) {
+            recipeStepsFragment = (RecipeStepsFragment) getSupportFragmentManager().getFragment(savedInstanceState, RecipeStepsFragment.class.getName());
+            recipeStepsFragment.setArguments(bundle);
+        } else {
+            recipeStepsFragment = new RecipeStepsFragment();
+            recipeStepsFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.recipe_steps_container, recipeStepsFragment)
+                    .commit();
+        }
         if (twoPaneLayout) {
             RecipeStepsMasterListFragment recipeStepsMasterListFragment = new RecipeStepsMasterListFragment();
             recipeStepsMasterListFragment.setArguments(bundle);
@@ -78,9 +85,11 @@ public class RecipeStepsActivity extends AppCompatActivity implements RecipeStep
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SAVE_INSTANCE_RECIPE_STEP_CURRENT_COUNT_KEY, recipeStepsFragment.getCurrentStepCount());
+        getSupportFragmentManager().putFragment(outState, RecipeStepsFragment.class.getName(), recipeStepsFragment);
     }
 
     public boolean twoPaneLayoutEnabled() {
         return twoPaneLayout;
     }
+
 }
