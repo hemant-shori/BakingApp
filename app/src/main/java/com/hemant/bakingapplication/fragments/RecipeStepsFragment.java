@@ -46,6 +46,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
     public static final String IS_TWO_PANE_LAYOUT_ENABLED_KEY = "IS_TWO_PANE_LAYOUT_ENABLED_KEY";
     private static final String SELECTED_PLAYER_POSITION_KEY = "SELECTED_PLAYER_POSITION_KEY";
     private static final String SELECTED_PLAYER_RESUME_WINDOW_KEY = "SELECTED_PLAYER_RESUME_WINDOW_KEY";
+    private static final String SELECTED_PLAYER_PLAY_STATE_KEY = "SELECTED_PLAYER_PLAY_STATE_KEY";
     private boolean twoPaneLayout = false;
     private ArrayList<RecipeStep> recipeStepArrayList;
     private int currentStepCount = 1;
@@ -53,6 +54,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
     private SimpleExoPlayer simpleExoPlayer;
     private long playerPosition = C.TIME_UNSET;
     private int resumeWindow = C.INDEX_UNSET;
+    private boolean isPlayWhenReady = true;
 
     @Nullable
     @Override
@@ -89,6 +91,9 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             if (savedInstanceState.containsKey(SELECTED_PLAYER_RESUME_WINDOW_KEY)) {
                 resumeWindow = savedInstanceState.getInt(SELECTED_PLAYER_RESUME_WINDOW_KEY);
             }
+            if (savedInstanceState.containsKey(SELECTED_PLAYER_PLAY_STATE_KEY)) {
+                isPlayWhenReady = savedInstanceState.getBoolean(SELECTED_PLAYER_PLAY_STATE_KEY);
+            }
         }
     }
 
@@ -103,7 +108,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
                 simpleExoPlayer.seekTo(resumeWindow, playerPosition);
             }
             simpleExoPlayer.prepare(mediaSource, !haveResumePosition, false);
-            simpleExoPlayer.setPlayWhenReady(true);
+            simpleExoPlayer.setPlayWhenReady(isPlayWhenReady);
         }
     }
 
@@ -148,6 +153,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
             simpleExoPlayer.stop();
             playerPosition = simpleExoPlayer.getCurrentPosition();
             resumeWindow = simpleExoPlayer.getCurrentWindowIndex();
+            isPlayWhenReady = simpleExoPlayer.getPlayWhenReady();
         }
     }
 
@@ -189,6 +195,7 @@ public class RecipeStepsFragment extends Fragment implements View.OnClickListene
         if (resumeWindow != C.INDEX_UNSET) {
             outState.putInt(SELECTED_PLAYER_RESUME_WINDOW_KEY, resumeWindow);
         }
+        outState.putBoolean(SELECTED_PLAYER_PLAY_STATE_KEY, isPlayWhenReady);
     }
 
     @Override
